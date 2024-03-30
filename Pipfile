@@ -11,6 +11,7 @@ pynput = "*"
 black = "*"
 pydantic = "*"
 orjson = "*"
+loguru = "*"
 
 [dev-packages]
 

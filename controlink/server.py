@@ -1,6 +1,7 @@
 import socket
-import logging
+import orjson
 
+from loguru import logger
 from pynput import mouse
 from pynput.mouse import Listener
 from controlink.utils import get_monitors, get_primary_ip
@@ -13,6 +14,7 @@ class Server:
         self.conn = None
         self.listener = Listener(on_move=self.on_move)
         self.monitors = get_monitors()
+        self.has_control = True
 
     def track_input(self):
         with mouse.Listener(on_move=self.on_move) as listener:
@@ -28,21 +30,50 @@ class Server:
 
     def detect_margin(self, x, y):
         monitor = self.get_current_monitor(x, y)
+        client_x = None
+        client_y = None
+
         if x == monitor.x:
-            self.send_message("Left margin")
+            # Cursor is at the left margin; move it to the right margin
+            client_x = monitor.x + monitor.width - 2  # Position it just inside the right margin
+            client_y = y
         elif x == monitor.x + monitor.width - 1:
-            self.send_message("Right margin")
+            # Cursor is at the right margin; move it to the left margin
+            client_x = monitor.x + 1  # Position it just inside the left margin
+            client_y = y
         elif y == monitor.y:
-            self.send_message("Top margin")
+            # Cursor is at the top margin; move it to the bottom margin
+            client_x = x
+            client_y = monitor.y + monitor.height - 2  # Position it just above the bottom margin
         elif y == monitor.y + monitor.height - 1:
-            self.send_message("Bottom margin")
+            # Cursor is at the bottom margin; move it to the top margin
+            client_x = x
+            client_y = monitor.y + 1  # Position it just below the top margin
+
+        if client_x is not None and client_y is not None:
+            self.send_message({
+                "cmd": "move_cursor",
+                "args": {
+                    "x": client_x,
+                    "y": client_y,
+                }
+            })
+
+            self.has_control = False
 
     def on_move(self, x, y):
-        self.detect_margin(x, y)
+        if self.has_control:
+            self.detect_margin(x, y)
+        else:
+            logger.warning("Doesn't have control anymore.")
 
-    def send_message(self, message):
+    def send_message(self, message: dict):
         if self.conn:
-            self.conn.sendall(message.encode("utf-8"))
+            try:
+                self.conn.sendall(orjson.dumps(message))
+            except BrokenPipeError:
+                logger.error("Connection closed by client.")
+                self.conn = None
 
     def run(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
@@ -51,9 +82,9 @@ class Server:
             )  # Enable SO_REUSEADDR
             server_socket.bind((self.host, self.port))
             server_socket.listen()
-            logging.info(f"Server listening on {self.host}:{self.port}")
+            logger.info(f"Server listening on {self.host}:{self.port}")
             self.conn, addr = server_socket.accept()
-            logging.info(f"Connected by {addr}")
+            logger.info(f"Connected by {addr}")
             with self.conn:
                 self.track_input()
 
@@ -63,7 +94,7 @@ def main():
     try:
         server.run()
     except KeyboardInterrupt:
-        logging.info("Server shutting down.")
+        logger.info("Server shutting down.")
 
 
 if __name__ == "__main__":

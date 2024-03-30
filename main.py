@@ -1,9 +1,6 @@
 import sys
-import logging
 
 from controlink import server, client
-
-logging.basicConfig(level=logging.INFO)
 
 
 def main():
