@@ -1,4 +1,7 @@
 import socket
+import logging
+
+from controlink.utils import get_primary_ip
 
 
 class Client:
@@ -9,19 +12,22 @@ class Client:
     def run(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((self.host, self.port))
-            print(f"Connected to {self.host}:{self.port}")
+            logging.info(f"Connected to {self.host}:{self.port}")
             while True:
                 data = client_socket.recv(1024)
                 if not data:
-                    print("Connection closed by server.")
+                    logging.info("Connection closed by server.")
                     break
-                print('Mouse position:', data.decode('utf-8'))
+                logging.info(f"Mouse position: {data.decode('utf-8')}")
 
 
 def main():
-    server_ip = '127.0.0.1'
+    server_ip = get_primary_ip()
     client = Client(server_ip)
-    client.run()
+    try:
+        client.run()
+    except KeyboardInterrupt:
+        logging.info("Exiting client.")
 
 
 if __name__ == "__main__":
