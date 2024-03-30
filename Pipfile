@@ -12,6 +12,7 @@ black = "*"
 pydantic = "*"
 orjson = "*"
 loguru = "*"
+pyautogui = "*"
 
 [dev-packages]
 

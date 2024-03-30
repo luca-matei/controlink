@@ -1,5 +1,6 @@
 import socket
 import orjson
+import pyautogui
 
 from loguru import logger
 from pynput.mouse import Controller
@@ -25,7 +26,7 @@ class Client(Host):
         Move cursor using pynput
         """
         logger.info(f"Moving cursor to {x}, {y}")
-        self.mouse.position = (x, y)
+        pyautogui.moveTo(x, y)
 
         if self.detect_margin(x, y) == "left":
             self.send_message({
@@ -38,7 +39,7 @@ class Client(Host):
         Move cursor by a delta
         """
         try:
-            self.mouse.move(dx, dy)
+            pyautogui.move(dx, dy)
         except ValueError:
             pass
 
