@@ -16,6 +16,7 @@ class Client(Host):
         self.server_port = settings.client.server_port
         self.registered_commands = [
             "move_cursor",
+            "delta_move_cursor",
         ]
         self.mouse = Controller()
 
@@ -31,6 +32,12 @@ class Client(Host):
                 "cmd": "gain_control",
                 "args": {}
             })
+
+    def delta_move_cursor(self, dx: int, dy: int):
+        x, y = self.mouse.position
+        x += dx
+        y += dy
+        self.move_cursor(x, y)
 
     def send_message(self, message: dict):
         self.client_socket.sendall(orjson.dumps(message))

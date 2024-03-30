@@ -7,7 +7,6 @@ class Host:
 
     def get_current_monitor(self, x, y):
         for monitor in self.monitors:
-            print(monitor.x, monitor.y, monitor.width, monitor.height)
             if (
                 monitor.x <= x <= monitor.x + monitor.width
                 and monitor.y <= y <= monitor.y + monitor.height
