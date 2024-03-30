@@ -63,7 +63,10 @@ class Client(Host):
                         logger.info("Connection closed by server.")
                         break
 
-                    self.process_message(data)
+                    try:
+                        self.process_message(data)
+                    except Exception as e:
+                        logger.error(f"Error processing message: {e}")
 
         except ConnectionRefusedError:
             logger.error(f"Connection refused by {self.server_host}:{self.server_port}")
