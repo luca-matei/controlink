@@ -39,6 +39,7 @@ class Client(Host):
         Move cursor by a delta
         """
         try:
+            logger.info(f"Moving cursor by {dx}, {dy}")
             pyautogui.move(dx, dy)
         except ValueError:
             pass
