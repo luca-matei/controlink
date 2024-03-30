@@ -28,17 +28,19 @@ class Client(Host):
         self.mouse.position = (x, y)
 
         if self.detect_margin(x, y) == "left":
-            print("LEFT")
             self.send_message({
                 "cmd": "gain_control",
                 "args": {}
             })
 
     def delta_move_cursor(self, dx: int, dy: int):
-        x, y = self.mouse.position
-        x += dx
-        y += dy
-        self.move_cursor(x, y)
+        """
+        Move cursor by a delta
+        """
+        try:
+            self.mouse.move(dx, dy)
+        except ValueError:
+            pass
 
     def send_message(self, message: dict):
         self.client_socket.sendall(orjson.dumps(message))

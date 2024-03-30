@@ -99,7 +99,7 @@ class Server(Host):
                 args = message.get("args")
 
                 if command in self.registered_commands:
-                    getattr(self, command)(conn, **args)
+                    getattr(self, command)(**args)
 
             except ConnectionResetError:
                 break  # Connection reset by client
