@@ -28,6 +28,7 @@ class Client(Host):
         self.mouse.position = (x, y)
 
         if self.detect_margin(x, y) == "left":
+            print("LEFT")
             self.send_message({
                 "cmd": "gain_control",
                 "args": {}

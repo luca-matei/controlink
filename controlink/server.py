@@ -2,7 +2,7 @@ import socket
 import orjson
 import threading
 from loguru import logger
-from pynput.mouse import Listener
+from pynput.mouse import Listener, Controller
 
 from controlink.host import Host
 from controlink.utils import get_monitors, get_primary_ip
@@ -20,6 +20,10 @@ class Server(Host):
         self.registered_commands = [
             "gain_control",
         ]
+        self.center_x = self.monitors[0].width // 2
+        self.center_y = self.monitors[0].height // 2
+        self.control_client = None
+        self.mouse = Controller()
 
     def track_input(self):
         self.listener.start()
@@ -35,10 +39,11 @@ class Server(Host):
             self.send_message(client_conn, {
                 "cmd": "move_cursor",
                 "args": {
-                    "x": 0,
-                    "y": 0,
+                    "x": 10,
+                    "y": 10,
                 }
             })
+            self.control_client = client_conn
             self.has_control = False
             logger.info("Lost control.")
 
@@ -46,9 +51,33 @@ class Server(Host):
         logger.info("Gained control.")
         self.has_control = True
 
+    def move_cursor_to_center(self):
+        self.mouse.position = (self.center_x, self.center_y)
+
     def on_move(self, x, y):
         if self.has_control:
             self.check_margin(x, y)
+        else:
+            dx = x - self.center_x
+            dy = y - self.center_y
+
+            direction = {"dx": 0, "dy": 0}
+            if dx != 0:
+                direction["dx"] = int(dx / abs(dx))  # 1 for right, -1 for left
+            if dy != 0:
+                direction["dy"] = int(dy / abs(dy))  # 1 for down, -1 for up
+
+            # Send the direction message if there was any movement
+            if dx != 0 or dy != 0:
+                self.send_message(
+                    self.control_client,
+                    {
+                        "cmd": "delta_move_cursor",
+                        "args": direction
+                    }
+                )
+
+            self.move_cursor_to_center()
 
     def send_message(self, conn, message: dict):
         if conn in self.clients:
