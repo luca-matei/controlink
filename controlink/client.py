@@ -26,8 +26,11 @@ class Client(Host):
         Move cursor using pynput
         """
         logger.info(f"Moving cursor to {x}, {y}")
-        pyautogui.moveTo(x, y)
+        self.mouse.position = (x, y)
+        self.cede_control()
 
+    def cede_control(self):
+        x, y = self.mouse.position
         if self.detect_margin(x, y) == "left":
             self.send_message({
                 "cmd": "gain_control",
@@ -39,8 +42,9 @@ class Client(Host):
         Move cursor by a delta
         """
         try:
-            logger.info(f"Moving cursor by {dx}, {dy}")
-            pyautogui.move(dx, dy)
+            logger.info(f"Moving cursor by {dx}, {dy} to {self.mouse.position}")
+            self.mouse.move(dx, dy)
+            self.cede_control()
         except ValueError:
             pass
 
