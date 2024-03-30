@@ -9,6 +9,8 @@ wheel = "*"
 screeninfo = "*"
 pynput = "*"
 black = "*"
+pydantic = "*"
+orjson = "*"
 
 [dev-packages]
 

@@ -1,0 +1,13 @@
+{
+
+"server": {
+    "host": "primary",
+    "port": 65432
+},
+
+"client": {
+    "server_host": "192.168.1.71",
+    "server_port": 65432
+}
+
+}
