@@ -1,15 +1,15 @@
 import sys
-from controlink import host, client
+from controlink import server, client
 
 
 def main():
-    if '--host' in sys.argv:
-        host.main()
+    if '--server' in sys.argv:
+        server.main()
     elif '--client' in sys.argv:
         client.main()
     else:
         print('Usage:')
-        print('pipenv run python3 main.py --host')
+        print('pipenv run python3 main.py --server')
         print('pipenv run python3 main.py --client')
 
 

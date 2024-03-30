@@ -2,32 +2,27 @@ import socket
 
 
 class Client:
-    def __init__(self):
-        pass
+    def __init__(self, host, port=65432):
+        self.host = host
+        self.port = port
 
-    def listen(self):
-        """
-        Connect to a socket server and send a JSON with "connected" message.
-        """
-
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        conn.connect(('localhost', 65432))
-
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-
-            self.process_message(data)
-
-    def process_message(self, message):
-        """
-        Process a message from the server.
-        """
-        message = message.decode('utf-8')
-        print(message)
+    def run(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect((self.host, self.port))
+            print(f"Connected to {self.host}:{self.port}")
+            while True:
+                data = client_socket.recv(1024)
+                if not data:
+                    print("Connection closed by server.")
+                    break
+                print('Mouse position:', data.decode('utf-8'))
 
 
 def main():
-    client = Client()
-    client.listen()
+    server_ip = '127.0.0.1'
+    client = Client(server_ip)
+    client.run()
+
+
+if __name__ == "__main__":
+    main()
