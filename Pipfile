@@ -18,4 +18,4 @@ pyautogui = "*"
 
 [requires]
 python_version = "3.11"
-python_full_version = "3.11.7"
+python_full_version = "3.11.9"
