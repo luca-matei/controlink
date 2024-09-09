@@ -3,7 +3,6 @@ import orjson
 import pyautogui
 
 from loguru import logger
-from pynput.mouse import Controller
 
 from controlink.config import settings
 from controlink.host import Host
@@ -38,7 +37,7 @@ class Client(Host):
         Move cursor by a delta
         """
         try:
-            logger.info(f"Moving cursor by {dx}, {dy} to {self.mouse.position}")
+            logger.info(f"Moving cursor by {dx}, {dy} to {pyautogui.position()}")
             pyautogui.moveRel(dx, dy)
             self.cede_control()
         except ValueError:
