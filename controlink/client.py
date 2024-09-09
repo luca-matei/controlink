@@ -32,10 +32,7 @@ class Client(Host):
     def cede_control(self):
         x, y = self.mouse.position
         if self.detect_margin(x, y) == "left":
-            self.send_message({
-                "cmd": "gain_control",
-                "args": {}
-            })
+            self.send_message({"cmd": "gain_control", "args": {}})
 
     def delta_move_cursor(self, dx: int, dy: int):
         """
@@ -61,7 +58,9 @@ class Client(Host):
 
     def run(self):
         try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as self.client_socket:
+            with socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM
+            ) as self.client_socket:
                 self.client_socket.connect((self.server_host, self.server_port))
                 logger.info(f"Connected to {self.server_host}:{self.server_port}")
 

@@ -16,7 +16,7 @@ class Server(Host):
         self.port = port
         self.clients = {}  # Dictionary to manage multiple connections
         self.has_control = True
-        self.margin_map = {'left': None, 'right': None, 'top': None, 'bottom': None}
+        self.margin_map = {"left": None, "right": None, "top": None, "bottom": None}
         self.listener = Listener(on_move=self.on_move)
         self.registered_commands = [
             "gain_control",
@@ -37,13 +37,16 @@ class Server(Host):
             client_conn = self.margin_map.get(margin)
 
         if client_conn:
-            self.send_message(client_conn, {
-                "cmd": "move_cursor",
-                "args": {
-                    "x": 10,
-                    "y": 10,
-                }
-            })
+            self.send_message(
+                client_conn,
+                {
+                    "cmd": "move_cursor",
+                    "args": {
+                        "x": 10,
+                        "y": 10,
+                    },
+                },
+            )
             self.control_client = client_conn
             self.has_control = False
             logger.info("Lost control.")
@@ -71,11 +74,7 @@ class Server(Host):
             # Send the direction message if there was any movement
             if dx != 0 or dy != 0:
                 self.send_message(
-                    self.control_client,
-                    {
-                        "cmd": "delta_move_cursor",
-                        "args": direction
-                    }
+                    self.control_client, {"cmd": "delta_move_cursor", "args": direction}
                 )
 
             self.move_cursor_to_center()
@@ -111,7 +110,7 @@ class Server(Host):
     def handle_client(self, conn, addr):
         self.clients[conn] = addr
         logger.info(f"Connected by {addr}")
-        self.margin_map['right'] = conn
+        self.margin_map["right"] = conn
         # Start a new thread to process messages from this client
         thread = threading.Thread(target=self.process_messages, args=(conn,))
         thread.daemon = True
