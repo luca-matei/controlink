@@ -28,6 +28,7 @@ class Server(Host):
 
     def track_input(self):
         self.listener.start()
+        logger.info("Started tracking input.")
 
     def check_margin(self, x, y):
         client_conn = None
@@ -118,7 +119,6 @@ class Server(Host):
 
     def run(self):
         self.track_input()
-        logger.info("Started tracking input.")
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
             server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -127,6 +127,7 @@ class Server(Host):
             logger.info(f"Server listening on {self.host}:{self.port}")
 
             while True:
+                print("Waiting for connection...")
                 conn, addr = server_socket.accept()
                 thread = threading.Thread(target=self.handle_client, args=(conn, addr))
                 thread.daemon = True
